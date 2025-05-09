@@ -19,5 +19,6 @@ bash replace_the_trl.sh
 
 评测路径: 
 cd FastChat/fastchat/llm_judge/
+
 python gen_judgment.py # 有些配置需要看源文件，目前依靠default可以启动
 
