@@ -11,4 +11,7 @@ download --model Qwen/Qwen2.5-3B-Instruct
 
 LLaMA-Factory安装参考其README
 
+**更改trl库，使其支持新的dpo loss**
+bash replace_the_trl.sh
+
 评测参考使用MT-Bench，但是gpt4太贵了，换成经济一点的deepseek (还在施工中)
