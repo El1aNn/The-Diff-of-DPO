@@ -20,5 +20,7 @@ bash replace_the_trl.sh
 评测路径: 
 cd FastChat/fastchat/llm_judge/
 
+export DEEPSEEK_API_KEY="your_api_key_here"
+
 python gen_judgment.py # 有些配置需要看源文件，目前依靠default可以启动
 
