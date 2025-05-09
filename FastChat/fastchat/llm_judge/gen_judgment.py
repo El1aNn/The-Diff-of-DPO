@@ -170,8 +170,8 @@ def make_judge_single(judge_model, judge_prompts):
 
 
 if __name__ == "__main__":
-    # import os
-    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    import os
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--bench-name",
