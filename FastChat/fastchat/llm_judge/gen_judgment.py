@@ -2,6 +2,9 @@
 Usage:
 python gen_judgment.py --model-list [LIST-OF-MODEL-ID] --parallel [num-concurrent-api-call] --mode [single|pairwise-baseline|pairwise-all]
 """
+import sys
+sys.path.append('/root/autodl-tmp/RLHF_compare/FastChat')
+
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -167,6 +170,8 @@ def make_judge_single(judge_model, judge_prompts):
 
 
 if __name__ == "__main__":
+    # import os
+    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--bench-name",
@@ -180,7 +185,7 @@ if __name__ == "__main__":
         default="data/judge_prompts.jsonl",
         help="The file of judge prompts.",
     )
-    parser.add_argument("--judge-model", type=str, default="gpt-4")
+    parser.add_argument("--judge-model", type=str, default="deepseek-chat")
     parser.add_argument("--baseline-model", type=str, default="gpt-3.5-turbo")
     parser.add_argument(
         "--mode",
@@ -198,11 +203,11 @@ if __name__ == "__main__":
         "--model-list",
         type=str,
         nargs="+",
-        default=None,
+        default=['qwen2.5'],
         help="A list of models to be evaluated",
     )
     parser.add_argument(
-        "--parallel", type=int, default=1, help="The number of concurrent API calls."
+        "--parallel", type=int, default=20, help="The number of concurrent API calls."
     )
     parser.add_argument(
         "--first-n", type=int, help="A debug option. Only run the first `n` judgments."
@@ -230,6 +235,7 @@ if __name__ == "__main__":
         models = get_model_list(answer_dir)
     else:
         models = args.model_list
+    # print(models)
 
     if args.mode == "single":
         judges = make_judge_single(args.judge_model, judge_prompts)

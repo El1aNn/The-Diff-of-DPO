@@ -166,9 +166,7 @@ def run_judge_single(question, answer, judge, ref_answer, multi_turn=False):
     conv.append_message(conv.roles[1], None)
     if model in DEEPSEEK_MODEL_LIST:  # 假设有一个列表包含支持的 DeepSeek 模型
         judgment = chat_completion_deepseek(model, conv, temperature=0, max_tokens=2048)
-    else:
-        raise ValueError(f"Invalid judge model name: {model}")
-    if model in OPENAI_MODEL_LIST:
+    elif model in OPENAI_MODEL_LIST:
         judgment = chat_completion_openai(model, conv, temperature=0, max_tokens=2048)
     elif model in ANTHROPIC_MODEL_LIST:
         judgment = chat_completion_anthropic(
@@ -411,41 +409,64 @@ import requests
 import time
 
 
-DEEPSEEK_API_URL = os.environ.get("DEEPSEEK_API_URL", "http://localhost:5000/api/v1/chat")
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "your_deepseek_api_key")  # 替换为你的 DeepSeek API 密钥
+
 
 def chat_completion_deepseek(model, conv, temperature, max_tokens, api_dict=None):
     """
     调用 DeepSeek API 获取模型响应
+    Args:
+        model: 模型名称（如 "deepseek-chat"）
+        conv: 对话对象（需包含 to_openai_api_messages() 方法）
+        temperature: 生成温度
+        max_tokens: 最大 token 数
+        api_dict: 可选的其他 API 参数
+    Returns:
+        str: 模型生成的响应内容
     """
-    if api_dict is not None:
-        DEEPSEEK_API_URL = api_dict.get("api_base", DEEPSEEK_API_URL)
-        DEEPSEEK_API_KEY = api_dict.get("api_key", DEEPSEEK_API_KEY)
-
+    DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
+    DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'  # 注意修正的端点
+    
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
         "Content-Type": "application/json"
     }
+    
     data = {
         "model": model,
-        "messages": conv.to_openai_api_messages(), 
+        "messages": conv.to_openai_api_messages(),
         "temperature": temperature,
-        "max_tokens": max_tokens
+        "max_tokens": max_tokens,
+        "stream": False  # 明确关闭流式传输
     }
+    
+    # 合并可选参数
+    if api_dict:
+        data.update(api_dict)
 
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
-            response = requests.post(DEEPSEEK_API_URL, headers=headers, json=data)
-            response.raise_for_status()  # 检查请求是否成功
-            output = response.json()["content"]  # 假设响应中的内容在 "content" 字段
+            response = requests.post(
+                DEEPSEEK_API_URL,
+                headers=headers,
+                json=data,
+                timeout=30  # 添加超时设置
+            )
+            response.raise_for_status()
+            
+            # 修正响应解析方式（DeepSeek API 返回结构示例）
+            reply = response.json()
+            output = reply["choices"][0]["message"]["content"]
             break
+            
         except requests.exceptions.RequestException as e:
-            print(type(e), e)
+            print(f"[Error] API请求失败: {type(e).__name__}: {e}")
+            time.sleep(API_RETRY_SLEEP)
+        except (KeyError, IndexError) as e:
+            print(f"[Error] 响应解析失败: {e}\n原始响应: {response.text}")
             time.sleep(API_RETRY_SLEEP)
 
     return output
-
 def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None:
         openai.api_base = api_dict["api_base"]
