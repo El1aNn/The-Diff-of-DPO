@@ -9,7 +9,7 @@ finetuning_type: lora
 lora_rank: 8
 lora_target: all
 pref_beta: 0.1
-pref_loss: sigmoid  # choices: [sigmoid (dpo), orpo, simpo]
+pref_loss: sigmoid  # choices: [sigmoid (dpo), orpo, simpo, ]
 
 ### dataset
 dataset: train
