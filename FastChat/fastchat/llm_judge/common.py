@@ -12,12 +12,14 @@ import time
 from typing import Optional
 
 import openai
+import requests
 import anthropic
 
 from fastchat.model.model_adapter import (
     get_conversation_template,
     ANTHROPIC_MODEL_LIST,
     OPENAI_MODEL_LIST,
+    DEEPSEEK_MODEL_LIST,
 )
 
 # API setting constants
@@ -162,7 +164,10 @@ def run_judge_single(question, answer, judge, ref_answer, multi_turn=False):
     conv.set_system_message(system_prompt)
     conv.append_message(conv.roles[0], user_prompt)
     conv.append_message(conv.roles[1], None)
-
+    if model in DEEPSEEK_MODEL_LIST:  # 假设有一个列表包含支持的 DeepSeek 模型
+        judgment = chat_completion_deepseek(model, conv, temperature=0, max_tokens=2048)
+    else:
+        raise ValueError(f"Invalid judge model name: {model}")
     if model in OPENAI_MODEL_LIST:
         judgment = chat_completion_openai(model, conv, temperature=0, max_tokens=2048)
     elif model in ANTHROPIC_MODEL_LIST:
@@ -402,7 +407,44 @@ def play_a_match_pair(match: MatchPair, output_file: str):
             fout.write(json.dumps(result) + "\n")
 
     return result
+import requests
+import time
 
+
+DEEPSEEK_API_URL = os.environ.get("DEEPSEEK_API_URL", "http://localhost:5000/api/v1/chat")
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "your_deepseek_api_key")  # 替换为你的 DeepSeek API 密钥
+
+def chat_completion_deepseek(model, conv, temperature, max_tokens, api_dict=None):
+    """
+    调用 DeepSeek API 获取模型响应
+    """
+    if api_dict is not None:
+        DEEPSEEK_API_URL = api_dict.get("api_base", DEEPSEEK_API_URL)
+        DEEPSEEK_API_KEY = api_dict.get("api_key", DEEPSEEK_API_KEY)
+
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": model,
+        "messages": conv.to_openai_api_messages(), 
+        "temperature": temperature,
+        "max_tokens": max_tokens
+    }
+
+    output = API_ERROR_OUTPUT
+    for _ in range(API_MAX_RETRY):
+        try:
+            response = requests.post(DEEPSEEK_API_URL, headers=headers, json=data)
+            response.raise_for_status()  # 检查请求是否成功
+            output = response.json()["content"]  # 假设响应中的内容在 "content" 字段
+            break
+        except requests.exceptions.RequestException as e:
+            print(type(e), e)
+            time.sleep(API_RETRY_SLEEP)
+
+    return output
 
 def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None:
