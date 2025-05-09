@@ -1,12 +1,2 @@
-llamafactory-cli train configs/qwen_lora_dpo-0.01.yaml
-llamafactory-cli train configs/qwen_lora_dpo-0.1.yaml
-llamafactory-cli train configs/qwen_lora_dpo-0.2.yaml
-llamafactory-cli train configs/qwen_lora_dpo-0.4.yaml
-llamafactory-cli train configs/qwen_lora_dpo-0.6.yaml
-llamafactory-cli train configs/qwen_lora_dpo-0.8.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.01.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.1.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.2.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.4.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.6.yaml
-llamafactory-cli train configs/qwen_lora_orpo-0.8.yaml
+llamafactory-cli train configs/qwen_lora_dpop-0.1.yaml
+
