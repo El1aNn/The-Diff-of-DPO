@@ -1,0 +1,5 @@
+model_name_or_path: /root/.cache/modelscope/hub/models/Qwen/Qwen2.5-3B-Instruct/
+adapter_name_or_path:  /root/autodl-tmp/RLHF_compare/LLaMA-Factory/saves/qwen/dpop/lora/beta-0.1
+template: qwen
+infer_backend: huggingface  # choices: [huggingface, vllm, sglang]
+trust_remote_code: true

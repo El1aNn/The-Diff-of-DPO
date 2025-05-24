@@ -1,0 +1,13 @@
+### Note: DO NOT use quantized model or quantization_bit when merging lora adapters
+
+### model
+model_name_or_path: /root/.cache/modelscope/hub/models/Qwen/Qwen2.5-3B-Instruct/
+adapter_name_or_path: /root/autodl-tmp/RLHF_compare/LLaMA-Factory/saves/qwen/dpop/lora/beta-0.1
+template: qwen 
+trust_remote_code: true
+
+### export
+export_dir: saves/qwen/dpop/beta-0.1/merged
+export_size: 5
+export_device: cpu  # choices: [cpu, auto]
+export_legacy_format: false

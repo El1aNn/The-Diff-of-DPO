@@ -1,0 +1,2 @@
+python gen_model_answer.py --model-path /root/autodl-tmp/RLHF_compare/LLaMA-Factory/saves/qwen/dpop/beta-0.1/merged --model-id qwen-dpop-0.1
+python gen_model_answer.py --model-path /root/autodl-tmp/RLHF_compare/LLaMA-Factory/saves/qwen/dpo/beta-0.1/merged --model-id qwen-dpo-0.1

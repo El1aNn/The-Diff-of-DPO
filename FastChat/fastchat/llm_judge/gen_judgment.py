@@ -203,7 +203,7 @@ if __name__ == "__main__":
         "--model-list",
         type=str,
         nargs="+",
-        default=['qwen2.5'],
+        default=['qwen-dpo-0.1'],
         help="A list of models to be evaluated",
     )
     parser.add_argument(
